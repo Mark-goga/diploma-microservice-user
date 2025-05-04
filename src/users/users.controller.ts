@@ -1,14 +1,13 @@
 import { Controller } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { Observable } from 'rxjs';
 import {
   CreateUserDto,
-  FindOneUserDto,
-  PaginationDto,
+  FindOneUserDto, PaginationDto,
   UpdateUserDto,
   UserServiceController,
-  UserServiceControllerMethods,
-} from '@app/common';
-import { Observable } from 'rxjs';
+  UserServiceControllerMethods
+} from "../lib/common/src";
 
 @Controller()
 @UserServiceControllerMethods()

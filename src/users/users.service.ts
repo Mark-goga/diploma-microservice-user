@@ -1,13 +1,7 @@
 import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import {
-  CreateUserDto,
-  PaginationDto,
-  UpdateUserDto,
-  User,
-  Users,
-} from '@app/common';
 import { randomUUID } from 'crypto';
 import { Observable, Subject } from 'rxjs';
+import { CreateUserDto, PaginationDto, UpdateUserDto, User, Users } from "../lib/common/src";
 
 @Injectable()
 export class UsersService implements OnModuleInit {

@@ -3,11 +3,12 @@ import { UsersService } from './users.service';
 import { Observable } from 'rxjs';
 import {
   CreateUserDto,
-  FindOneUserDto, PaginationDto,
+  FindOneUserDto,
+  PaginationDto,
   UpdateUserDto,
   UserServiceController,
-  UserServiceControllerMethods
-} from "../lib/common/src";
+  UserServiceControllerMethods,
+} from '@lib/common/src';
 
 @Controller()
 @UserServiceControllerMethods()

@@ -2,7 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import { AUTH_PACKAGE_NAME, PROTO_PATH } from '@lib/common/src';
+import { GrpcValidationPipe, PROTO_PATH } from '@lib/src';
+import { USER_PACKAGE_NAME } from '@proto/user/user';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -11,10 +12,14 @@ async function bootstrap() {
       transport: Transport.GRPC,
       options: {
         protoPath: join(__dirname, `${PROTO_PATH}/user/user.proto`),
-        package: AUTH_PACKAGE_NAME,
+        package: USER_PACKAGE_NAME,
+        loader: {
+          includeDirs: [join(__dirname, PROTO_PATH)],
+        },
       },
     },
   );
+  app.useGlobalPipes(new GrpcValidationPipe());
   await app.listen();
 }
 

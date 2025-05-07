@@ -1,22 +1,25 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import { Observable, Subject } from 'rxjs';
-import { CreateUserDto, PaginationDto, UpdateUserDto, User, Users } from '@lib/common/src';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto, UpdateUserDto, User, Users } from '@proto/user/user';
 
 @Injectable()
-export class UsersService implements OnModuleInit {
-  private readonly users: User[] = [];
-
-  onModuleInit() {
-    for (let i = 0; i < 10; i++) {
-      this.create({ name: randomUUID(), email: randomUUID() });
-    }
-  }
+export class UsersService {
+  private readonly users: User[] = [
+    {
+      id: '1',
+      name: 'John Doe',
+      email: 'goga@gmail.com',
+      role: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ];
 
   create(createUserDto: CreateUserDto): User {
     const user: User = {
       ...createUserDto,
-      id: randomUUID(),
+      id: 'jskdhgfdjsh',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     this.users.push(user);
     return user;
@@ -48,18 +51,5 @@ export class UsersService implements OnModuleInit {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return this.users.splice(userIndex)[0];
-  }
-
-  queryUser(paginationDtoStream: Observable<PaginationDto>): Observable<Users> {
-    const subject = new Subject<Users>();
-    const onNext = (pagination: PaginationDto) => {
-      const start = pagination.page * pagination.skip;
-      subject.next({
-        users: this.users.slice(start, start + pagination.skip),
-      });
-    };
-    const onComplete = () => subject.complete();
-    paginationDtoStream.subscribe({ next: onNext, complete: onComplete });
-    return subject.asObservable();
   }
 }

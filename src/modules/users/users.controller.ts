@@ -1,41 +1,37 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Observable } from 'rxjs';
 import {
-  CreateUserDto,
-  FindOneUserDto,
-  PaginationDto,
-  UpdateUserDto,
   UserServiceController,
   UserServiceControllerMethods,
-} from '@lib/common/src';
+} from '@proto/user/user';
+import { CreateUserValidator } from '@modules/users/dto/create-user.dto';
+import { UpdateUserValidator } from '@modules/users/dto/update-user.dto';
+import { FindOneDocumentValidator } from '@lib/src';
+import { FindManyUsersValidator } from '@modules/users/dto/get-users.dto';
 
 @Controller()
 @UserServiceControllerMethods()
 export class UsersController implements UserServiceController {
   constructor(private readonly usersService: UsersService) {}
 
-  createUser(createUserDto: CreateUserDto) {
+  createUser(@Body() createUserDto: CreateUserValidator) {
     return this.usersService.create(createUserDto);
   }
 
-  findUsers() {
+  findUsers(@Body() findManyUsersDto: FindManyUsersValidator) {
+    console.log('findManyUsersDto', findManyUsersDto);
     return this.usersService.findAll();
   }
 
-  findOneUser(findOneUserDto: FindOneUserDto) {
+  findOneUser(@Body() findOneUserDto: FindOneDocumentValidator) {
     return this.usersService.findOne(findOneUserDto.id);
   }
 
-  updateUser(updateUserDto: UpdateUserDto) {
+  updateUser(@Body() updateUserDto: UpdateUserValidator) {
     return this.usersService.update(updateUserDto.id, updateUserDto);
   }
 
-  deleteUser(findOneUserDto: FindOneUserDto) {
+  deleteUser(@Body() findOneUserDto: FindOneDocumentValidator) {
     return this.usersService.remove(findOneUserDto.id);
-  }
-
-  queryUser(paginationDtoObservable: Observable<PaginationDto>) {
-    return this.usersService.queryUser(paginationDtoObservable);
   }
 }

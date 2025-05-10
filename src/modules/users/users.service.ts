@@ -1,55 +1,78 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto, User, Users } from '@proto/user/user';
+import { Injectable } from '@nestjs/common';
+import { CreateUserDto, UpdateUserDto } from '@proto/user/user';
+import { UsersRepository } from '@modules/users/users.repository';
+import { FindManyUsersValidator } from '@modules/users/dto/get-users.dto';
+import { PaginationUtil } from '@lib/src';
+import { FilterUtil } from '@lib/src/utils/filter-for-prisma.utils';
+import { Prisma } from '@prisma/client';
+import { FILTER_CONFIG_FOR_USER } from '@modules/users/constants/user-filter.constants';
+import { SortForPrismaUtil } from '@lib/src/utils/sort-for-prisma.util';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[] = [
-    {
-      id: '1',
-      name: 'John Doe',
-      email: 'goga@gmail.com',
-      role: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ];
+  constructor(private readonly userRepository: UsersRepository) {}
 
-  create(createUserDto: CreateUserDto): User {
-    const user: User = {
-      ...createUserDto,
-      id: 'jskdhgfdjsh',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+  async create(createUserDto: CreateUserDto) {
+    // const newUser = await this.userRepository.create(createUserDto);
+    // return UsersMap.mapPrismaUserToProtoUser(newUser);
+    return this.userRepository.create(createUserDto);
+  }
+
+  async findAll(options: FindManyUsersValidator) {
+    const pagination = PaginationUtil.getSkipAndLimit({
+      ...options.pagination,
+    });
+
+    const where = FilterUtil.buildPrismaWhere<Prisma.UsersWhereInput>(
+      options.filters,
+      FILTER_CONFIG_FOR_USER,
+    );
+
+    const sort =
+      SortForPrismaUtil.sortForPrisma<Prisma.UsersOrderByWithRelationInput>(
+        options.sorting,
+      );
+
+    const [users, total] = await Promise.all([
+      this.userRepository.findMany(pagination, where, sort),
+      this.userRepository.count(where),
+    ]);
+
+    const paginationMeta = PaginationUtil.getMeta(
+      options.pagination.page,
+      pagination.limit,
+      total,
+    );
+
+    // return {
+    //   users: UsersMap.mapArrPrismaUsersToProtoUsers(users),
+    //   pagination: { ...paginationMeta },
+    // };
+
+    return {
+      users,
+      pagination: {
+        ...paginationMeta,
+      },
     };
-    this.users.push(user);
-    return user;
   }
 
-  findAll(): Users {
-    return { users: this.users };
+  async findOne(id: string) {
+    // const user = await this.userRepository.findByIdOrThrow(id);
+    // return UsersMap.mapPrismaUserToProtoUser(user);
+    return this.userRepository.findByIdOrThrow(id);
   }
 
-  findOne(id: string): User {
-    return this.users.find((user) => user.id === id);
+  async update(updateUserDto: UpdateUserDto) {
+    const { id, ...data } = updateUserDto;
+    // const user = await this.userRepository.update(id, data);
+    // return UsersMap.mapPrismaUserToProtoUser(user);
+    return this.userRepository.update(id, data);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto): User {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    this.users[userIndex] = {
-      ...this.users[userIndex],
-      ...updateUserDto,
-    };
-    return this.users[userIndex];
-  }
-
-  remove(id: string) {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    return this.users.splice(userIndex)[0];
+  async remove(id: string) {
+    // const user = await this.userRepository.delete(id);
+    // return UsersMap.mapPrismaUserToProtoUser(user);
+    return this.userRepository.delete(id);
   }
 }

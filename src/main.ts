@@ -2,7 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import { GrpcValidationPipe, PROTO_PATH } from '@lib/src';
+import {
+  GrpcPrismaExceptionFilter,
+  GrpcValidationPipe,
+  PROTO_PATH,
+} from '@lib/src';
 import { USER_PACKAGE_NAME } from '@proto/user/user';
 
 async function bootstrap() {
@@ -19,6 +23,9 @@ async function bootstrap() {
       },
     },
   );
+
+  app.useGlobalFilters(new GrpcPrismaExceptionFilter());
+
   app.useGlobalPipes(new GrpcValidationPipe());
   await app.listen();
 }

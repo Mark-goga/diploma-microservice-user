@@ -1,32 +1,45 @@
-import { FindManyDto } from '@proto/common/common';
+import { FindManyDto, SortDirection } from '@proto/common/common';
 import {
-  ArrayNotEmpty,
   IsEnum,
+  IsNotEmpty,
+  IsNumber,
   IsString,
+  Max,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-
-enum AllowedUserFilterFields {
-  name = 'name',
-  email = 'email',
-  role = 'role',
-}
+import {
+  AllowedUserFilterFields,
+  AllowedUserSortingFields,
+} from '@modules/users/enums';
 
 class PaginationDtoValidator {
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @IsNotEmpty()
   page: number;
-  skip: number;
+
+  @Type(() => Number)
+  @IsNumber()
+  @IsNotEmpty()
+  @Max(50)
+  limit: number;
 }
 
 class SortingDtoValidator {
+  @IsEnum(AllowedUserSortingFields)
+  @IsNotEmpty()
   field: string;
+
+  @IsEnum(SortDirection)
+  @IsNotEmpty()
   direction: number;
 }
 
 class FilterDtoValidator {
-  @IsEnum(AllowedUserFilterFields, {
-    message: 'Invalid filter field. Allowed fields are: name, email, role',
-  })
+  @IsEnum(AllowedUserFilterFields)
   field: string;
 
   @IsString()
@@ -36,13 +49,13 @@ class FilterDtoValidator {
 export class FindManyUsersValidator implements FindManyDto {
   @ValidateNested()
   @Type(() => PaginationDtoValidator)
+  @IsNotEmpty()
   pagination: PaginationDtoValidator;
 
   @ValidateNested()
   @Type(() => SortingDtoValidator)
   sorting: SortingDtoValidator;
 
-  @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => FilterDtoValidator)
   filters: FilterDtoValidator[];

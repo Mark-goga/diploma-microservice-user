@@ -17,12 +17,14 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
+    "strict": true,
+    "noUnusedParameters": false,
     "paths": {
       "@lib/*": ["src/lib/common/*"],
       "@proto/*": ["src/lib/common/src/proto/*"],
       "@modules/*": ["src/modules/*"],
       "@common/*": ["src/common/*"],
-      "@database/*": ["src/common/database/*"],
+      "@database/*": ["src/common/database/*"]
     }
   }
 }

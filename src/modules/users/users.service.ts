@@ -13,8 +13,6 @@ export class UsersService {
   constructor(private readonly userRepository: UsersRepository) {}
 
   async create(createUserDto: CreateUserDto) {
-    // const newUser = await this.userRepository.create(createUserDto);
-    // return UsersMap.mapPrismaUserToProtoUser(newUser);
     return this.userRepository.create(createUserDto);
   }
 
@@ -44,11 +42,6 @@ export class UsersService {
       total,
     );
 
-    // return {
-    //   users: UsersMap.mapArrPrismaUsersToProtoUsers(users),
-    //   pagination: { ...paginationMeta },
-    // };
-
     return {
       users,
       pagination: {
@@ -58,21 +51,15 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    // const user = await this.userRepository.findByIdOrThrow(id);
-    // return UsersMap.mapPrismaUserToProtoUser(user);
     return this.userRepository.findByIdOrThrow(id);
   }
 
   async update(updateUserDto: UpdateUserDto) {
     const { id, ...data } = updateUserDto;
-    // const user = await this.userRepository.update(id, data);
-    // return UsersMap.mapPrismaUserToProtoUser(user);
     return this.userRepository.update(id, data);
   }
 
   async remove(id: string) {
-    // const user = await this.userRepository.delete(id);
-    // return UsersMap.mapPrismaUserToProtoUser(user);
     return this.userRepository.delete(id);
   }
 }

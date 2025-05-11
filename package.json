@@ -24,7 +24,7 @@
     "db:seed": "prisma db seed",
     "db:migrate": "npx prisma migrate dev",
     "db:migrate:deploy": "npx prisma migrate deploy",
-    "generate:from:proto": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --proto_path=./src/lib/common/src/proto --ts_proto_out=./src/lib/common/src/proto --ts_proto_opt=nestJs=true user/user.proto"
+    "generate:from:proto": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --proto_path=./src/lib/common/src/proto --ts_proto_out=./src/lib/common/src/proto --ts_proto_opt=nestJs=true user/user.proto common/common.proto auth/auth.proto"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.13.3",
@@ -35,6 +35,7 @@
     "@nestjs/microservices": "^11.1.0",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^6.7.0",
+    "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "nestjs-pino": "^4.4.0",

@@ -21,7 +21,9 @@ export class UsersMap {
 
   static mapPrismaUserToProtoUser(user: PrismaUser): ProtoUser {
     return {
-      ...user,
+      id: user.id,
+      email: user.email,
+      name: user.name,
       ...DateMapUtils.mapCreatedUpdatedAtDateToISOString(user),
       role: this.mapPrismaRoleToProtoRole(user.role),
     };

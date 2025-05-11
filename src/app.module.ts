@@ -3,6 +3,7 @@ import { UsersModule } from '@modules/users/users.module';
 import { PrismaModule } from '@database/prisma/prisma.module';
 import { LoggerModule } from 'nestjs-pino';
 import { CONFIG } from '@common/constants';
+import { AuthModule } from '@modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CONFIG } from '@common/constants';
         };
       },
     }),
+    AuthModule,
   ],
   controllers: [],
   providers: [],

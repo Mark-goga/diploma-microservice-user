@@ -45,6 +45,14 @@ export class UsersRepository {
     });
   }
 
+  async findByEmailOrThrow(email: string) {
+    return this.prismaService.users.findUniqueOrThrow({
+      where: {
+        email,
+      },
+    });
+  }
+
   async update(id: string, data: Prisma.UsersUpdateInput) {
     return this.prismaService.users.update({
       ...this.omitPassword,

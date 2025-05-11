@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcryptjs';
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '@proto/user/user';
 import { UsersRepository } from '@modules/users/users.repository';
@@ -12,8 +13,20 @@ import { SortForPrismaUtil } from '@lib/src/utils/sort-for-prisma.util';
 export class UsersService {
   constructor(private readonly userRepository: UsersRepository) {}
 
+  async hashPassword(password: string) {
+    return bcrypt.hash(password, 10);
+  }
+
+  async findByEmail(email: string) {
+    return this.userRepository.findByEmailOrThrow(email);
+  }
+
   async create(createUserDto: CreateUserDto) {
-    return this.userRepository.create(createUserDto);
+    const hashedPassword = await this.hashPassword(createUserDto.password);
+    return this.userRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
   }
 
   async findAll(options: FindManyUsersValidator) {

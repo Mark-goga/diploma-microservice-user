@@ -3,6 +3,7 @@ import { PrismaService } from '@database/prisma/prisma.service';
 import { CreateSessionData } from '@modules/auth/utils/session.util';
 import { TokenType } from '@proto/auth/auth';
 import { Prisma } from '@prisma/client';
+import { Tokens } from '@modules/auth/auth.type';
 
 @Injectable()
 export class AuthRepository {
@@ -29,8 +30,7 @@ export class AuthRepository {
   }
 
   async updateSession(
-    accessToken: string,
-    refreshToken: string,
+    { accessToken, refreshToken }: Tokens,
     data: Prisma.SessionUpdateInput,
   ) {
     return this.prismaService.session.update({
@@ -39,6 +39,36 @@ export class AuthRepository {
         refreshToken: refreshToken,
       },
       data,
+      include: {
+        user: true,
+      },
+    });
+  }
+
+  async deleteSession({ accessToken, refreshToken }: Tokens) {
+    return this.prismaService.session.delete({
+      where: {
+        accessToken,
+        refreshToken,
+      },
+    });
+  }
+
+  async findSessionsByUserId(userId: string) {
+    return this.prismaService.session.findMany({
+      where: {
+        userId,
+      },
+    });
+  }
+
+  async deleteSessionsByIds(ids: string[]) {
+    return this.prismaService.session.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
     });
   }
 }

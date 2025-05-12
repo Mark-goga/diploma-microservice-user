@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcryptjs';
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from '@proto/user/user';
+import { CreateUserDto, UpdateUserDto, User, Users } from '@proto/user/user';
 import { UsersRepository } from '@modules/users/users.repository';
 import { FindManyUsersValidator } from '@modules/users/dto/get-users.dto';
 import { PaginationUtil } from '@lib/src';
@@ -8,6 +8,7 @@ import { FilterUtil } from '@lib/src/utils/filter-for-prisma.utils';
 import { Prisma } from '@prisma/client';
 import { FILTER_CONFIG_FOR_USER } from '@modules/users/constants/user-filter.constants';
 import { SortForPrismaUtil } from '@lib/src/utils/sort-for-prisma.util';
+import { UsersMap } from '@modules/users/users.map';
 
 @Injectable()
 export class UsersService {
@@ -21,15 +22,16 @@ export class UsersService {
     return this.userRepository.findByEmailOrThrow(email);
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await this.hashPassword(createUserDto.password);
-    return this.userRepository.create({
+    const user = await this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
+    return UsersMap.mapPrismaUserToProtoUser(user);
   }
 
-  async findAll(options: FindManyUsersValidator) {
+  async findAll(options: FindManyUsersValidator): Promise<Users> {
     const pagination = PaginationUtil.getSkipAndLimit({
       ...options.pagination,
     });
@@ -56,23 +58,26 @@ export class UsersService {
     );
 
     return {
-      users,
+      users: UsersMap.mapArrPrismaUsersToProtoUsers(users),
       pagination: {
         ...paginationMeta,
       },
     };
   }
 
-  async findOne(id: string) {
-    return this.userRepository.findByIdOrThrow(id);
+  async findOne(id: string): Promise<User> {
+    const user = await this.userRepository.findByIdOrThrow(id);
+    return UsersMap.mapPrismaUserToProtoUser(user);
   }
 
-  async update(updateUserDto: UpdateUserDto) {
+  async update(updateUserDto: UpdateUserDto): Promise<User> {
     const { id, ...data } = updateUserDto;
-    return this.userRepository.update(id, data);
+    const user = await this.userRepository.update(id, data);
+    return UsersMap.mapPrismaUserToProtoUser(user);
   }
 
-  async remove(id: string) {
-    return this.userRepository.delete(id);
+  async remove(id: string): Promise<User> {
+    const user = await this.userRepository.delete(id);
+    return UsersMap.mapPrismaUserToProtoUser(user);
   }
 }
